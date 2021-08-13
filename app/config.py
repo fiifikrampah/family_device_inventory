@@ -6,4 +6,4 @@ host = os.environ.get('POSTGRES_HOST')
 database = os.environ.get('POSTGRES_DB')
 port = os.environ.get('POSTGRES_PORT')
 secret_key = os.environ.get('SECRET_KEY')
-DATABASE_CONNECTION_URI = f'postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}'
+DATABASE_CONNECTION_URI = f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{database}"
