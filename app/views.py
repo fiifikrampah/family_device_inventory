@@ -6,7 +6,8 @@ from wtforms import SubmitField, SelectField, RadioField, HiddenField, StringFie
 from wtforms.validators import InputRequired, Length, Regexp, NumberRange
 
 from app import create_app
-from db.models import Users, Devices
+from db.models import db, Users, Devices
+from uuid import uuid4
 
 app = create_app()
 Bootstrap(app)
@@ -19,16 +20,14 @@ class AddDevice(FlaskForm):
     device_type = StringField('Type')
     device_serial = StringField('Serial')
     device_model = StringField('Model')
-    device_mac = StringField('MAC ADDRESS', Regexp(r'[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$'),
-                             message="Invalid MAC ADDRESS")
+    device_mac = StringField('MAC Address')
     status = SelectField('Device Status', [InputRequired()],
                          choices=[('', ''), ('Active', 'Active'),
                                   ('Inactive', 'Inactive'),
                                   ('Abandoned', 'Abandoned'),
                                   ('Lost', 'Lost')])
-    purchase_date = StringField('Color', [InputRequired()], Regexp(
-        r'[\d]{1,2}/[\d]{1,2}/[\d]{4}', message="Invalid Date. Date should be in dd/mm/yyyy format."))
-    owner = StringField('Username')
+    purchase_date = StringField('Purchase Date', [InputRequired()])
+    owner = StringField('Owner Username')
     category = SelectField('Device Category', [InputRequired()],
                            choices=[('', ''), ('Phone', 'Phone'),
                                     ('Tablet', 'Tablet'),
@@ -67,6 +66,8 @@ def inventory(category):
 def add_device():
     form1 = AddDevice()
     if form1.validate_on_submit():
+        random_id = str(uuid4().int>>64)
+        id = int(random_id[:5])
         name = request.form['device_name']
         device_type = request.form['device_type']
         serial = request.form['device_serial']
@@ -79,7 +80,7 @@ def add_device():
         notes = request.form['notes']
 
         # Add the data into the Devices table
-        record = Devices(name, device_type, serial, model, mac_address,
+        record = Devices(id, name, device_type, serial, model, mac_address,
                          status, purchase_date, owner, category, notes)
         db.session.add(record)
         db.session.commit()
