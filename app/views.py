@@ -50,6 +50,13 @@ def index():
     return render_template('index.html', device_categories=device_categories)
 
 
+@app.route('/inventory/<category>')
+def inventory(category):
+    tech = Devices.query.filter_by(
+        category=category).order_by(Devices.name).all()
+    return render_template('device_list.html', tech=tech, category=category)
+
+
 @app.route('/add_device', methods=['GET', 'POST'])
 def add_device():
     form1 = AddDevice()
