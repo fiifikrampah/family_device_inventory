@@ -90,6 +90,17 @@ def add_device():
                 ), 'error')
         return render_template('add_device.html', form1=form1)
 
+# select a device to edit or delete
+
+
+@app.route('/select_device/<letters>')
+def select_device(letters):
+    # Alphabetical sort of devices by name, chunked by letters between _ and _
+    a, b = list(letters)
+    tech = Devices.query.filter(
+        Devices.name.between(a, b)).order_by(Devices.name).all()
+    return render_template('select_device.html', tech=tech)
+
 
 # Run the app
 if __name__ == '__main__':
