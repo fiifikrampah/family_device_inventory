@@ -38,6 +38,11 @@ class AddDevice(FlaskForm):
     notes = TextAreaField('Notes')
     submit = SubmitField('Add/Update Device')
 
+class DeleteForm(FlaskForm):
+    id_field = HiddenField()
+    purpose = HiddenField()
+    submit = SubmitField('Delete This Device')
+
 # routes
 # add a new device to the database
 
@@ -101,6 +106,16 @@ def select_device(letters):
         Devices.name.between(a, b)).order_by(Devices.name).all()
     return render_template('select_device.html', tech=tech)
 
+
+# edit or delete a device
+@app.route('/edit_or_delete', methods=['POST'])
+def edit_or_delete():
+    id = request.form['id']
+    choice = request.form['choice']
+    device = Devices.query.filter(Devices.id == id).first()
+    form1 = AddDevice()
+    form2 = DeleteForm()
+    return render_template('edit_or_delete.html', device=device, form1=form1, form2=form2, choice=choice)
 
 # Run the app
 if __name__ == '__main__':
