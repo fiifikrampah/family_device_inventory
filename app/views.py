@@ -7,8 +7,7 @@ from wtforms.validators import InputRequired, Length, Regexp, NumberRange
 
 from app import create_app
 from db.models import db, Users, Devices
-from uuid import uuid4
-
+from db.database import generate_id, add_instance, delete_instance, edit_instance
 app = create_app()
 Bootstrap(app)
 
@@ -66,26 +65,21 @@ def inventory(category):
 def add_device():
     form1 = AddDevice()
     if form1.validate_on_submit():
-        random_id = str(uuid4().int>>64)
-        id = int(random_id[:5])
-        name = request.form['device_name']
-        device_type = request.form['device_type']
-        serial = request.form['device_serial']
-        model = request.form['device_model']
-        mac_address = request.form['device_mac']
-        status = request.form['status']
-        purchase_date = request.form['purchase_date']
-        owner = request.form['owner']
-        category = request.form['category']
-        notes = request.form['notes']
-
-        # Add the data into the Devices table
-        record = Devices(id, name, device_type, serial, model, mac_address,
-                         status, purchase_date, owner, category, notes)
-        db.session.add(record)
-        db.session.commit()
+        add_instance(Devices,
+                     id=generate_id(),
+                     name=request.form['device_name'],
+                     device_type=request.form['device_type'],
+                     serial=request.form['device_serial'],
+                     model=request.form['device_model'],
+                     mac_address=request.form['device_mac'],
+                     status=request.form['status'],
+                     purchase_date=request.form['purchase_date'],
+                     owner_username=request.form['owner'],
+                     category=request.form['category'],
+                     notes=request.form['notes']
+                     )
         # create a message to send to the template
-        message = f"The data for device {name} has been submitted."
+        message = f"The data for device {request.form['device_name']} has been submitted."
         return render_template('add_device.html', message=message)
     else:
         # show validaton errors
@@ -125,11 +119,10 @@ def edit_or_delete():
 def delete_result():
     id = request.form['id_field']
     purpose = request.form['purpose']
-    device = Devices.query.filter(Devices.id == id).first()
     if purpose == 'delete':
-        db.session.delete(device)
+        deleted_device = delete_instance(Devices, id)
         db.session.commit()
-        message = f"The device {device.name} has been deleted from the database."
+        message = f"The device {deleted_device} has been deleted from the database."
         return render_template('result.html', message=message)
     else:
         # this calls an error handler
@@ -141,30 +134,26 @@ def delete_result():
 @app.route('/edit_result', methods=['POST'])
 def edit_result():
     id = request.form['id_field']
-    # call up the record from the database
-    device = Devices.query.filter(Devices.id == id).first()
-    # update all values
-    device.name = request.form['device_name']
-    device.device_type = request.form['device_type']
-    device.serial = request.form['device_serial']
-    device.model = request.form['device_model']
-    device.mac_address = request.form['device_mac']
-    device.status = request.form['status']
-    device.purchase_date = request.form['purchase_date']
-    device.owner_username = request.form['owner']
-    device.category = request.form['category']
-    device.notes = request.form['notes']
-
+    device = edit_instance(Devices, id,
+                           name=request.form['device_name'],
+                           device_type=request.form['device_type'],
+                           serial=request.form['device_serial'],
+                           model=request.form['device_model'],
+                           mac_address=request.form['device_mac'],
+                           status=request.form['status'],
+                           purchase_date=request.form['purchase_date'],
+                           owner_username=request.form['owner'],
+                           category=request.form['category'],
+                           notes=request.form['notes']
+                           )
     form1 = AddDevice()
     if form1.validate_on_submit():
-        # update database record
-        db.session.commit()
         # create a message to send to the template
-        message = f"The data for device {device.name} has been updated."
+        message = f"The data for device {device[1]} has been updated."
         return render_template('result.html', message=message)
     else:
         # show validaton errors
-        device.id = id
+        device[0] = id
 
         for field, errors in form1.errors.items():
             for error in errors:
