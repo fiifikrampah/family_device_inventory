@@ -1,0 +1,92 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+{{ super() }}
+	<style>
+		body { background: #e8f1f9; }
+		ul { display: flex; }
+	</style>
+{% endblock %}
+
+
+{% block title %}
+Select a Device
+{% endblock %}
+
+
+{% block content %}
+<div class="container">
+  <div class="row pb-5">
+    <div class="col-lg-10 mx-lg-auto">
+
+      <h1 class="pt-5 pb-2">Select a Device</h1>
+
+      <p class="lead alert alert-success">Select one device to edit or delete.</p>
+
+	  <!-- links to display a group of devices, alphabetically -->
+	  <ul class="pl-0">
+		  <li class="text-center list-group-item list-group-item-action"><a href="{{ url_for( 'select_device', letters='AF' ) }}">A &ndash; E</a></li>
+		  <li class="text-center list-group-item list-group-item-action"><a href="{{ url_for( 'select_device', letters='FM' ) }}">F &ndash; L</a></li>
+		  <li class="text-center list-group-item list-group-item-action"><a href="{{ url_for( 'select_device', letters='MS' ) }}">M &ndash; R</a></li>
+		  <li class="text-center list-group-item list-group-item-action"><a href="{{ url_for( 'select_device', letters='Sa' ) }}">S &ndash; Z</a></li>
+	  </ul>
+
+	  <p class="ml-4"><a href="{{ url_for('index') }}">Return Home.</a></p>
+
+	  <form method="POST" id="form2" action="{{ url_for('edit_or_delete') }}">
+
+		<table class="table">
+			<tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Serial</th>
+                <th>Model</th>
+                <th>MAC Address</th>
+                <th>Status</th>
+                <th>Purchase Date</th>
+                <th>Owner</th>
+                <th>Category</th>
+                <th>Notes</th>
+			</tr>
+
+			<!-- loop through all the devices -->
+			{% for device in tech %}
+			<tr>
+				<td class="center-align"><input type="radio" name="id" value="{{ device.id }}" required></td>
+                <td>{{ device.id }}</td>
+                <td>{{ device.name }}</td>
+                <td>{{ device.device_type }}</td>
+                <td>{{ device.serial }}</td>
+                <td>{{ device.model }}</td>
+                <td>{{ device.mac_address }}</td>
+                <td>{{ device.status }}</td>
+                <td>{{ device.purchase_date }}</td>
+                <td>{{ device.owner_username }}</td>
+                <td>{{ device.category }}</td>
+                <td>{{ device.notes }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+
+		<div class="form-group lead alert alert-success pb-4">
+          <p>How do you want to update the device?</p>
+
+          <div class="form-check form-check-inline">
+          <label class="form-check-label"><input class="form-check-input" type="radio" name="choice" value="delete" required> Delete it</label>
+          </div>
+          <div class="form-check form-check-inline">
+          <label class="form-check-label"><input class="form-check-input" type="radio" name="choice" value="edit" required> Edit it</label>
+          </div>
+        </div><!-- end form-group -->
+
+		<div class="form-group">
+	        <input class="btn btn-success" type="submit" value="Submit Choice">
+        </div>
+
+		</form>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
