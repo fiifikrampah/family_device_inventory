@@ -1,0 +1,41 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+{{ super() }}
+	<style>
+		body { background: #e8f1f9; }
+	</style>
+{% endblock %}
+
+{% block title %}
+FamilyDeviceInventory
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container" style="text-align: center;">
+  <div class="row">
+      <h1 class="pt-5 pb-2">Family Device Inventory</h1>
+
+      <p class="lead">Choose a device category below:</p>
+      <table class="table" border='2' style="text-align: center;">
+        <tr>
+            <th style="text-align: center;">Category</th>
+            <tr>
+            <td>
+                {% for cat in device_categories %}
+                <a href="{{ url_for( 'inventory', category=cat.category ) }}">{{ cat.category }}</a>
+                {% endfor %}
+            </td>
+          </tr>
+        </tr>
+      </table>
+
+	  <!-- links -->
+	  <p>Got a new device? <a href="{{ url_for('add_device') }}">Add new device</a>.</p>
+      <p>Update an existing device? <a href="{{ url_for( 'select_device', letters='AF' ) }}">Edit existing device</a>.</p>
+  </div>
+</div>
+
+{% endblock %}
