@@ -22,6 +22,15 @@ class Users(db.Model):
         """Check hashed password."""
         return check_password_hash(self.password, password)
 
+    def __init__(self, uid, username, password, usertype, phone_number, first_name, last_name):
+        self.uid = uid
+        self.username = username
+        self.password = password
+        self.usertype = usertype
+        self.phone_number = phone_number
+        self.first_name = first_name
+        self.last_name = last_name
+
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
