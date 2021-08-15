@@ -38,6 +38,7 @@ class AddDevice(FlaskForm):
     notes = TextAreaField('Notes')
     submit = SubmitField('Add/Update Device')
 
+
 class DeleteForm(FlaskForm):
     id_field = HiddenField()
     purpose = HiddenField()
@@ -116,6 +117,23 @@ def edit_or_delete():
     form1 = AddDevice()
     form2 = DeleteForm()
     return render_template('edit_or_delete.html', device=device, form1=form1, form2=form2, choice=choice)
+
+
+# result of delete - this function deletes the record
+@app.route('/delete_result', methods=['POST'])
+def delete_result():
+    id = request.form['id_field']
+    purpose = request.form['purpose']
+    device = Devices.query.filter(Devices.id == id).first()
+    if purpose == 'delete':
+        db.session.delete(device)
+        db.session.commit()
+        message = f"The device {device.name} has been deleted from the database."
+        return render_template('result.html', message=message)
+    else:
+        # this calls an error handler
+        abort(405)
+
 
 # Run the app
 if __name__ == '__main__':
