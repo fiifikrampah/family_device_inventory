@@ -134,6 +134,45 @@ def delete_result():
         # this calls an error handler
         abort(405)
 
+# result of edit - this function updates the record
+
+
+@app.route('/edit_result', methods=['POST'])
+def edit_result():
+    id = request.form['id_field']
+    # call up the record from the database
+    device = Devices.query.filter(Devices.id == id).first()
+    # update all values
+    device.name = request.form['device_name']
+    device.device_type = request.form['device_type']
+    device.serial = request.form['device_serial']
+    device.model = request.form['device_model']
+    device.mac_address = request.form['device_mac']
+    device.status = request.form['status']
+    device.purchase_date = request.form['purchase_date']
+    device.owner_username = request.form['owner']
+    device.category = request.form['category']
+    device.notes = request.form['notes']
+
+    form1 = AddDevice()
+    if form1.validate_on_submit():
+        # update database record
+        db.session.commit()
+        # create a message to send to the template
+        message = f"The data for device {device.name} has been updated."
+        return render_template('result.html', message=message)
+    else:
+        # show validaton errors
+        device.id = id
+
+        for field, errors in form1.errors.items():
+            for error in errors:
+                flash("Error in {}: {}".format(
+                    getattr(form1, field).label.text,
+                    error
+                ), 'error')
+        return render_template('edit_or_delete.html', form1=form1, device=device, choice='edit')
+
 
 # Run the app
 if __name__ == '__main__':
