@@ -42,6 +42,14 @@ class AddDevice(FlaskForm):
 # add a new device to the database
 
 
+@app.route('/')
+def index():
+    # get a list of unique values in the category column
+    device_categories = Devices.query.with_entities(
+        Devices.category).distinct()
+    return render_template('index.html', device_categories=device_categories)
+
+
 @app.route('/add_device', methods=['GET', 'POST'])
 def add_device():
     form1 = AddDevice()
@@ -74,3 +82,8 @@ def add_device():
                     error
                 ), 'error')
         return render_template('add_device.html', form1=form1)
+
+
+# Run the app
+if __name__ == '__main__':
+    app.run(debug=True)
