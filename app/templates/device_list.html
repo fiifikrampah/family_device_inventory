@@ -1,0 +1,67 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block styles %}
+{{ super() }}
+<style>
+    body {
+        background: #e8f1f9;
+    }
+</style>
+{% endblock %}
+
+
+{% block title %}
+Device List
+{% endblock %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row pb-5">
+
+        <h1 class="pt-5 pb-2">List of Devices</h1>
+
+        <p class="lead alert alert-warning">This is a list of all the devices of the
+            <strong>{{ category }}</strong> category in our inventory.
+        </p>
+
+        <p class="ml-4"><a href="{{ url_for('index') }}">Return Home.</a></p>
+
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Serial</th>
+                <th>Model</th>
+                <th>MAC Address</th>
+                <th>Status</th>
+                <th>Purchase Date</th>
+                <th>Owner</th>
+                <th>Category</th>
+                <th>Notes</th>
+            </tr>
+
+            <!-- here is a for-loop to give us all the devices -->
+            {% for device in tech %}
+            <tr>
+                <td>{{ device.id }}</td>
+                <td>{{ device.name }}</td>
+                <td>{{ device.device_type }}</td>
+                <td>{{ device.serial }}</td>
+                <td>{{ device.model }}</td>
+                <td>{{ device.mac_address }}</td>
+                <td>{{ device.status }}</td>
+                <td>{{ device.purchase_date }}</td>
+                <td>{{ device.owner_username }}</td>
+                <td>{{ device.category }}</td>
+                <td>{{ device.notes }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+</div>
+
+{% endblock %}
