@@ -28,9 +28,9 @@ Add a Device
 			<p class="lead"><strong>{{ message }}</strong></p>
 
 			<!-- links -->
-			<p><a href="{{ url_for('add_device') }}">Add another device.</a></p>
+			<p><a href="{{ url_for('add_device') }}">Add another device</a></p>
 
-			<p><a href="{{ url_for('index') }}">Return Home.</a></p>
+			<p><a href="{{ url_for('index') }}">Return Home</a></p>
 
 		{% else %}
 
@@ -38,7 +38,7 @@ Add a Device
 
 			<p class="lead alert alert-primary">Add a new device to our inventory.</p>
 
-			<p class="ml-4"><a href="{{ url_for('index') }}">Return Home.</a></p>
+			<p class="ml-4"><a href="{{ url_for('index') }}">Return Home</a></p>
 
 			<!-- show flash - based on WTForms validators
 				 get_flashed_messages() exists here because of flash()

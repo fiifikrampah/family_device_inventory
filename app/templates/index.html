@@ -23,11 +23,15 @@ FamilyDeviceInventory
         <tr>
             <th style="text-align: center;">Category</th>
             <tr>
-            <td>
+            
                 {% for cat in device_categories %}
+                <tr>
+                <td>
                 <a href="{{ url_for( 'inventory', category=cat.category ) }}">{{ cat.category }}</a>
+                </td>
+                </tr>
                 {% endfor %}
-            </td>
+            
           </tr>
         </tr>
       </table>
