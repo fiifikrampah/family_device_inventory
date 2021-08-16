@@ -1,5 +1,6 @@
-from db.models import db
+from db.models import db, Users
 from uuid import uuid4
+import hashlib
 
 
 def get_all(table):
@@ -36,3 +37,19 @@ def generate_id():
     random_id = str(uuid4().int >> 64)
     id = int(random_id[:5])
     return id
+
+
+def validate_login(username, password):
+    user = Users.query.filter_by(username=username).first()
+    user_pass = user.password
+    hashed_pass = hashlib.md5(user_pass.encode('utf-8')).hexdigest()
+
+    # check if the user actually exists
+    # take the user-supplied password, hash it, and compare it to the hashed password in the database
+    if not user or not hashed_pass == password:
+        logged_in = False
+    if username == "" or password == " ":
+        logged_in = "Blank"
+    else:
+        logged_in = True
+    return logged_in

@@ -1,15 +1,37 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash,  redirect, url_for
 from flask_bootstrap import Bootstrap
 
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField, RadioField, HiddenField, StringField, IntegerField, FloatField, TextAreaField
+from wtforms import SubmitField, SelectField, RadioField, HiddenField, StringField, IntegerField, FloatField, TextAreaField, PasswordField
 from wtforms.validators import InputRequired, Length, Regexp, NumberRange
 
 from app import create_app
 from db.models import db, Users, Devices
-from db.database import generate_id, add_instance, delete_instance, edit_instance
+from db.database import generate_id, add_instance, delete_instance, edit_instance, validate_login
+from sqlalchemy.exc import IntegrityError
+import hashlib
 app = create_app()
 Bootstrap(app)
+
+# Global variable to track user login in status
+logged_in = False
+
+
+class UserLogIn(FlaskForm):
+    username = StringField('Username')
+    password = PasswordField('Password')
+    sign_in = SubmitField('Sign In')
+    sign_up = SubmitField('Sign Up')
+
+
+class AddUser(FlaskForm):
+    uid = HiddenField()
+    username = StringField('Username', [InputRequired()])
+    password = PasswordField('Password', [InputRequired()])
+    usertype = HiddenField()
+    fname = StringField('First Name', [InputRequired()])
+    lname = StringField('Last Name', [InputRequired()])
+    submit = SubmitField('Sign Up')
 
 
 class AddDevice(FlaskForm):
@@ -43,15 +65,69 @@ class DeleteForm(FlaskForm):
     submit = SubmitField('Delete This Device')
 
 # routes
-# add a new device to the database
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form3 = UserLogIn()
+    if form3.validate_on_submit():
+        if form3.sign_in.data:
+            username = request.form.get('username')
+            password = hashlib.md5(request.form.get(
+                'password').encode('utf-8')).hexdigest()
+            result = validate_login(username, password)
+            if result == True:
+                global logged_in
+                logged_in = True
+                return redirect(url_for('index'))
+            if result == "Blank":
+                flash('Please enter both your username and password!')
+            else:
+                flash('Your username or password is incorrect!')
+                return render_template('login.html', form3=form3)
+        if form3.sign_up.data:
+            return redirect(url_for('signup'))
+    return render_template('login.html', form3=form3)
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    form2 = AddUser()
+    if form2.validate_on_submit():
+        try:
+            # add the new user to the database
+            add_instance(Users,
+                         uid=generate_id(),
+                         username=request.form.get('username'),
+                         password=request.form.get('password'),
+                         usertype="FamilyMember",
+                         first_name=request.form.get('fname'),
+                         last_name=request.form.get('lname'),
+                         )
+            return redirect(url_for('login'))
+        except IntegrityError:
+            flash("Sorry that username is already taken!")
+            return render_template('signup.html', form2=form2)
+    else:
+        # show validaton errors
+        for field, errors in form2.errors.items():
+            for error in errors:
+                flash("Error in {}: {}".format(
+                    getattr(form2, field).label.text,
+                    error
+                ), 'error')
+        return render_template('signup.html', form2=form2)
 
 
 @app.route('/')
 def index():
-    # get a list of unique values in the category column
-    device_categories = Devices.query.with_entities(
-        Devices.category).distinct()
-    return render_template('index.html', device_categories=device_categories)
+    if logged_in == True:
+        # get a list of unique values in the category column
+        device_categories = Devices.query.with_entities(
+            Devices.category).distinct()
+        return render_template('index.html', device_categories=device_categories)
+    else:
+        return render_template('login.html')
 
 
 @app.route('/inventory/<category>')
@@ -59,6 +135,8 @@ def inventory(category):
     tech = Devices.query.filter_by(
         category=category).order_by(Devices.name).all()
     return render_template('device_list.html', tech=tech, category=category)
+
+# add a new device to the database
 
 
 @app.route('/add_device', methods=['GET', 'POST'])
