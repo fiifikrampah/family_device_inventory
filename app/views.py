@@ -127,7 +127,7 @@ def index():
             Devices.category).distinct()
         return render_template('index.html', device_categories=device_categories)
     else:
-        return render_template('login.html')
+        return redirect(url_for('login'))
 
 
 @app.route('/inventory/<category>')
