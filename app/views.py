@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, Length, Regexp, NumberRange
 
 from app import create_app
 from db.models import db, Users, Devices
-from db.database import generate_id, add_instance, delete_instance, edit_instance, validate_login
+from db.database import generate_id, add_instance, delete_instance, edit_instance, validate_login, WrongSignIn
 from sqlalchemy.exc import IntegrityError
 import hashlib
 app = create_app()
@@ -70,23 +70,25 @@ class DeleteForm(FlaskForm):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form3 = UserLogIn()
-    if form3.validate_on_submit():
-        if form3.sign_in.data:
-            username = request.form.get('username')
-            password = hashlib.md5(request.form.get(
-                'password').encode('utf-8')).hexdigest()
-            result = validate_login(username, password)
-            if result == True:
-                global logged_in
-                logged_in = True
-                return redirect(url_for('index'))
-            if result == "Blank":
-                flash('Please enter both your username and password!')
-            else:
-                flash('Your username or password is incorrect!')
-                return render_template('login.html', form3=form3)
-        if form3.sign_up.data:
-            return redirect(url_for('signup'))
+    try:
+        if form3.validate_on_submit():
+            if form3.sign_in.data:
+                username = request.form.get('username')
+                password = hashlib.md5(request.form.get(
+                    'password').encode('utf-8')).hexdigest()
+                result = validate_login(username, password)
+                if result == True:
+                    global logged_in
+                    logged_in = True
+                    return redirect(url_for('index'))
+                else:
+                    raise WrongSignIn
+            if form3.sign_up.data:
+                return redirect(url_for('signup'))
+    except AttributeError:
+        flash('Please enter both your username and password!')
+    except WrongSignIn:
+        flash('Your username or password is incorrect!')
     return render_template('login.html', form3=form3)
 
 
