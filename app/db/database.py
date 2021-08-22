@@ -2,6 +2,13 @@ from db.models import db, Users
 from uuid import uuid4
 import hashlib
 
+# Custom Exceptions
+
+
+class WrongSignIn(Exception):
+    """Raised when the sign in form is blank but sign-in is pressed"""
+    pass
+
 
 def get_all(table):
     data = table.query.all()
@@ -48,8 +55,6 @@ def validate_login(username, password):
     # take the user-supplied password, hash it, and compare it to the hashed password in the database
     if not user or not hashed_pass == password:
         logged_in = False
-    if username == "" or password == " ":
-        logged_in = "Blank"
     else:
         logged_in = True
     return logged_in
