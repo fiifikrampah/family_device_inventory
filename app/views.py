@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, Length, Regexp, NumberRange
 
 from app import create_app
 from db.models import db, Users, Devices
-from db.database import generate_id, add_instance, delete_instance, edit_instance, validate_login, WrongSignIn
+from db.database import generate_id, add_instance, delete_instance, edit_instance, validate_login, WrongSignIn, hash_password
 from sqlalchemy.exc import IntegrityError
 import hashlib
 app = create_app()
@@ -74,8 +74,7 @@ def login():
         if form3.validate_on_submit():
             if form3.sign_in.data:
                 username = request.form.get('username')
-                password = hashlib.md5(request.form.get(
-                    'password').encode('utf-8')).hexdigest()
+                password = hash_password(request.form.get('password'))
                 result = validate_login(username, password)
                 if result == True:
                     global logged_in
@@ -101,7 +100,7 @@ def signup():
             add_instance(Users,
                          uid=generate_id(),
                          username=request.form.get('username'),
-                         password=request.form.get('password'),
+                         password=hash_password(request.form.get('password')),
                          usertype="FamilyMember",
                          first_name=request.form.get('fname'),
                          last_name=request.form.get('lname'),
