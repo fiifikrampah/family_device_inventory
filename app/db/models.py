@@ -1,6 +1,5 @@
 import flask_sqlalchemy
-from werkzeug.security import generate_password_hash, check_password_hash
-
+import hashlib
 db = flask_sqlalchemy.SQLAlchemy()
 
 
@@ -13,18 +12,10 @@ class Users(db.Model):
     first_name = db.Column(db.String(255), unique=False, nullable=False)
     last_name = db.Column(db.String(255), unique=False, nullable=False)
 
-    def set_password(self, password):
-        """Create hashed password."""
-        self.password = generate_password_hash(password, method='sha256')
-
-    def check_password(self, password):
-        """Check hashed password."""
-        return check_password_hash(self.password, password)
-
     def __init__(self, uid, username, password, usertype, first_name, last_name):
         self.uid = uid
         self.username = username
-        self.password = password
+        self.password = hashlib.md5(password.encode('utf-8')).hexdigest()
         self.usertype = usertype
         self.first_name = first_name
         self.last_name = last_name

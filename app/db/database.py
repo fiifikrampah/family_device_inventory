@@ -45,15 +45,18 @@ def generate_id():
     id = int(random_id[:5])
     return id
 
+def hash_password(password):
+        """Create hashed password."""
+        hashed_password = hashlib.md5(password.encode('utf-8')).hexdigest()
+        return hashed_password
 
 def validate_login(username, password):
     user = Users.query.filter_by(username=username).first()
     user_pass = user.password
-    hashed_pass = hashlib.md5(user_pass.encode('utf-8')).hexdigest()
-
+    hashed_pass = hash_password(password)
     # check if the user actually exists
-    # take the user-supplied password, hash it, and compare it to the hashed password in the database
-    if not user or not hashed_pass == password:
+    # take the hashed user-entered password and compare it to the hashed password in the database
+    if not user or not user_pass == hashed_pass:
         logged_in = False
     else:
         logged_in = True
