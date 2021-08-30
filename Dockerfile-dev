@@ -1,0 +1,10 @@
+# This Dockerfile is used by the development config
+FROM python:3.9.6-slim-buster
+LABEL maintainer "Fiifi Krampah"
+
+COPY . /code
+WORKDIR /code
+RUN pip install -r requirements.txt
+
+ENV FLASK_ENV=dev
+EXPOSE 5000
