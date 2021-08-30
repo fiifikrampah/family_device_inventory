@@ -1,4 +1,4 @@
-from db.models import db, Users
+from app.models import db, Users
 from uuid import uuid4
 import hashlib
 
@@ -45,10 +45,12 @@ def generate_id():
     id = int(random_id[:5])
     return id
 
+
 def hash_password(password):
-        """Create hashed password."""
-        hashed_password = hashlib.md5(password.encode('utf-8')).hexdigest()
-        return hashed_password
+    """Create hashed password."""
+    hashed_password = hashlib.md5(password.encode('utf-8')).hexdigest()
+    return hashed_password
+
 
 def validate_login(username, password):
     user = Users.query.filter_by(username=username).first()

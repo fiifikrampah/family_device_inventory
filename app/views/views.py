@@ -1,73 +1,17 @@
-from flask import Flask, render_template, request, flash,  redirect, url_for
-from flask_bootstrap import Bootstrap
+from flask import Flask, render_template, request, flash,  redirect, url_for, Blueprint
 
-from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField, RadioField, HiddenField, StringField, IntegerField, FloatField, TextAreaField, PasswordField
-from wtforms.validators import InputRequired, Length, Regexp, NumberRange
-
-from app import create_app
-from db.models import db, Users, Devices
-from db.database import generate_id, add_instance, delete_instance, edit_instance, validate_login, WrongSignIn, hash_password
+from app.models import db, Users, Devices
+from app.core import generate_id, add_instance, delete_instance, edit_instance, validate_login, WrongSignIn, hash_password
 from sqlalchemy.exc import IntegrityError
-import hashlib
-app = create_app()
-Bootstrap(app)
+from .forms import UserLogIn, AddUser, AddDevice, DeleteForm
+
+flask_app = Blueprint("flask_app", __name__)  # initialize blueprint
 
 # Global variable to track user login in status
 logged_in = False
 
 
-class UserLogIn(FlaskForm):
-    username = StringField('Username')
-    password = PasswordField('Password')
-    sign_in = SubmitField('Sign In')
-    sign_up = SubmitField('Sign Up')
-
-
-class AddUser(FlaskForm):
-    uid = HiddenField()
-    username = StringField('Username', [InputRequired()])
-    password = PasswordField('Password', [InputRequired()])
-    usertype = HiddenField()
-    fname = StringField('First Name', [InputRequired()])
-    lname = StringField('Last Name', [InputRequired()])
-    submit = SubmitField('Sign Up')
-
-
-class AddDevice(FlaskForm):
-    # id used only by update/edit
-    id_field = HiddenField()
-    device_name = StringField('Name')
-    device_type = StringField('Type')
-    device_serial = StringField('Serial')
-    device_model = StringField('Model')
-    device_mac = StringField('MAC Address')
-    status = SelectField('Device Status', [InputRequired()],
-                         choices=[('', ''), ('Active', 'Active'),
-                                  ('Inactive', 'Inactive'),
-                                  ('Abandoned', 'Abandoned'),
-                                  ('Lost', 'Lost')])
-    purchase_date = StringField('Purchase Date', [InputRequired()])
-    owner = StringField('Owner Username')
-    category = SelectField('Device Category', [InputRequired()],
-                           choices=[('', ''), ('Phone', 'Phone'),
-                                    ('Tablet', 'Tablet'),
-                                    ('Laptop', 'Laptop'),
-                                    ('Desktop', 'Desktop'),
-                                    ('Other', 'Other')])
-    notes = TextAreaField('Notes')
-    submit = SubmitField('Add/Update Device')
-
-
-class DeleteForm(FlaskForm):
-    id_field = HiddenField()
-    purpose = HiddenField()
-    submit = SubmitField('Delete This Device')
-
-# routes
-
-
-@app.route('/login', methods=['GET', 'POST'])
+@flask_app.route('/login', methods=['GET', 'POST'])
 def login():
     form3 = UserLogIn()
     try:
@@ -79,11 +23,11 @@ def login():
                 if result == True:
                     global logged_in
                     logged_in = True
-                    return redirect(url_for('index'))
+                    return redirect(url_for('flask_app.index'))
                 else:
                     raise WrongSignIn
             if form3.sign_up.data:
-                return redirect(url_for('signup'))
+                return redirect(url_for('flask_app.signup'))
     except AttributeError:
         flash('Please enter both your username and password!')
     except WrongSignIn:
@@ -91,7 +35,7 @@ def login():
     return render_template('login.html', form3=form3)
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@flask_app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form2 = AddUser()
     if form2.validate_on_submit():
@@ -105,7 +49,7 @@ def signup():
                          first_name=request.form.get('fname'),
                          last_name=request.form.get('lname'),
                          )
-            return redirect(url_for('login'))
+            return redirect(url_for('flask_app.login'))
         except IntegrityError:
             flash("Sorry that username is already taken!")
             return render_template('signup.html', form2=form2)
@@ -120,7 +64,7 @@ def signup():
         return render_template('signup.html', form2=form2)
 
 
-@app.route('/')
+@flask_app.route('/')
 def index():
     if logged_in == True:
         # get a list of unique values in the category column
@@ -128,10 +72,10 @@ def index():
             Devices.category).distinct()
         return render_template('index.html', device_categories=device_categories)
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('flask_app.login'))
 
 
-@app.route('/inventory/<category>')
+@flask_app.route('/inventory/<category>')
 def inventory(category):
     tech = Devices.query.filter_by(
         category=category).order_by(Devices.name).all()
@@ -140,7 +84,7 @@ def inventory(category):
 # add a new device to the database
 
 
-@app.route('/add_device', methods=['GET', 'POST'])
+@flask_app.route('/add_device', methods=['GET', 'POST'])
 def add_device():
     form1 = AddDevice()
     if form1.validate_on_submit():
@@ -173,7 +117,7 @@ def add_device():
 # select a device to edit or delete
 
 
-@app.route('/select_device/<letters>')
+@flask_app.route('/select_device/<letters>')
 def select_device(letters):
     # Alphabetical sort of devices by name, chunked by letters between _ and _
     a, b = list(letters)
@@ -183,7 +127,7 @@ def select_device(letters):
 
 
 # edit or delete a device
-@app.route('/edit_or_delete', methods=['POST'])
+@flask_app.route('/edit_or_delete', methods=['POST'])
 def edit_or_delete():
     id = request.form['id']
     choice = request.form['choice']
@@ -194,7 +138,7 @@ def edit_or_delete():
 
 
 # result of delete - this function deletes the record
-@app.route('/delete_result', methods=['POST'])
+@flask_app.route('/delete_result', methods=['POST'])
 def delete_result():
     id = request.form['id_field']
     purpose = request.form['purpose']
@@ -210,7 +154,7 @@ def delete_result():
 # result of edit - this function updates the record
 
 
-@app.route('/edit_result', methods=['POST'])
+@flask_app.route('/edit_result', methods=['POST'])
 def edit_result():
     id = request.form['id_field']
     device = edit_instance(Devices, id,
@@ -245,21 +189,16 @@ def edit_result():
 # error routes
 
 
-@app.errorhandler(404)
+@flask_app.errorhandler(404)
 def page_not_found(e):
     return render_template('error.html', pagetitle="404 Error - Page Not Found", pageheading="Page not found (Error 404)", error=e), 404
 
 
-@app.errorhandler(405)
+@flask_app.errorhandler(405)
 def form_not_posted(e):
     return render_template('error.html', pagetitle="405 Error - Form Not Submitted", pageheading="The form was not submitted (Error 405)", error=e), 405
 
 
-@app.errorhandler(500)
+@flask_app.errorhandler(500)
 def internal_server_error(e):
     return render_template('error.html', pagetitle="500 Error - Internal Server Error", pageheading="Internal server error (500)", error=e), 500
-
-
-# Run the app
-if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)

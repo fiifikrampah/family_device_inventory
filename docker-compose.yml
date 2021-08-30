@@ -1,20 +1,30 @@
 version: "3.8"
 services:
   web:
-    build: .
+    container_name: flask_app
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
     volumes:
-      - ./app:/code/app
+      - .:/code
     depends_on:
       - db
     env_file: .env
+    environment:
+      - FLASK_ENV=dev
     ports:
       - 5000:5000
+    entrypoint:
+      - /code/scripts/docker_script.sh
   db:
+    container_name: postgres
     image: postgres:13.4-alpine
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    expose:
-      - 5432
+    ports:
+      - 5432:5432
     env_file: .env
 volumes:
   postgres_data:

@@ -27,7 +27,7 @@ FamilyDeviceInventory
                 {% for cat in device_categories %}
                 <tr>
                 <td>
-                <a href="{{ url_for( 'inventory', category=cat.category ) }}">{{ cat.category }}</a>
+                <a href="{{ url_for( 'flask_app.inventory', category=cat.category ) }}">{{ cat.category }}</a>
                 </td>
                 </tr>
                 {% endfor %}
@@ -37,8 +37,8 @@ FamilyDeviceInventory
       </table>
 
 	  <!-- links -->
-	  <p>Got a new device? <a href="{{ url_for('add_device') }}">Add new device</a>.</p>
-      <p>Update an existing device? <a href="{{ url_for( 'select_device', letters='AF' ) }}">Edit existing device</a>.</p>
+	  <p>Got a new device? <a href="{{ url_for('flask_app.add_device') }}">Add new device</a>.</p>
+      <p>Update an existing device? <a href="{{ url_for( 'flask_app.select_device', letters='AF' ) }}">Edit existing device</a>.</p>
   </div>
 </div>
 

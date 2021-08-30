@@ -1,4 +1,4 @@
-from app.db.models import Users, Devices
+from app.models import Users, Devices
 
 
 def test_new_user(new_user):
