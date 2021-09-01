@@ -4,6 +4,7 @@ import testing.postgresql
 import pytest
 import sqlalchemy
 from app import create_app
+from app.views.views import logged_in
 
 
 @pytest.fixture(scope='module')
@@ -27,7 +28,7 @@ def init_database():
     # Insert user data
     user1 = Users(uid='123456789', username='user1', password='password1',
                   usertype='FamilyMember', first_name='User1Fname', last_name='User1Lname')
-    user1 = Users(uid='987654321', username='user2', password='password2',
+    user2 = Users(uid='987654321', username='user2', password='password2',
                   usertype='FamilyMember', first_name='User2Fname', last_name='User2Lname')
     db.session.add(user1)
     db.session.add(user2)
@@ -55,11 +56,20 @@ def client(postgres):
         "SQLALCHEMY_DATABASE_URI": postgres.url(),
         "DEBUG": True,
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        "TESTING": True,
     }
     app = create_app(config_dict)
     app.app_context().push()
-    app.config['TESTING'] = True
-    app.config['WTF_CSRF_ENABLED'] = False
+    app.secret_key = 'test_secret_key'
     db.create_all()
     client = app.test_client()
     yield client
+
+
+@pytest.fixture(scope='function')
+def logged_in_user(client):
+    client.post('/login',
+                data=dict(username='user1', password='password1'),
+                follow_redirects=True)
+    # logged_in = True
+    yield
