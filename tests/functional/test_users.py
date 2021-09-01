@@ -15,152 +15,77 @@ def test_login_page(client):
     response = client.get('/login')
     assert response.status_code == 200
     assert b'Sign In' in response.data
+    assert b'Sign Up' in response.data
     assert b'Username' in response.data
     assert b'Password' in response.data
 
 
-# def test_valid_login_logout(test_client, init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/login' page is posted to (POST)
-#     THEN check the response is valid
-#     """
-#     response = test_client.post('/login',
-#                                 data=dict(email='patkennedy79@gmail.com', password='FlaskIsAwesome'),
-#                                 follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Thanks for logging in, patkennedy79@gmail.com!' in response.data
-#     assert b'Welcome patkennedy79@gmail.com!' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' in response.data
-#     assert b'Login' not in response.data
-#     assert b'Register' not in response.data
-
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/logout' page is requested (GET)
-#     THEN check the response is valid
-#     """
-#     response = test_client.get('/logout', follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Goodbye!' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' not in response.data
-#     assert b'Login' in response.data
-#     assert b'Register' in response.data
+def test_invalid_login(client, init_database):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/login' page is posted to with invalid credentials (POST)
+    THEN check an error message is returned to the user
+    """
+    response = client.post('/login',
+                           data=dict(username='user1', password='password2'),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Sign In' in response.data
+    assert b'Username' in response.data
+    assert b'Password' in response.data
 
 
-# def test_invalid_login(test_client, init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/login' page is posted to with invalid credentials (POST)
-#     THEN check an error message is returned to the user
-#     """
-#     response = test_client.post('/login',
-#                                 data=dict(email='patkennedy79@gmail.com', password='FlaskIsNotAwesome'),
-#                                 follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'ERROR! Incorrect login credentials.' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' not in response.data
-#     assert b'Login' in response.data
-#     assert b'Register' in response.data
+def test_valid_signup(client, init_database):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/signup' page is posted to (POST)
+    THEN check the response is valid and the user is logged in
+    """
+    response = client.post('/signup',
+                           data=dict(username='user3',
+                                     password='password3',
+                                     first_name='User2Fname',
+                                     last_name='User2Lname'),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Username' in response.data
+    assert b'Password' in response.data
+    assert b'First Name' in response.data
+    assert b'Last Name' in response.data
+    assert b'Sign Up' in response.data
 
 
-# def test_login_already_logged_in(test_client, init_database, login_default_user):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/login' page is posted to (POST) when the user is already logged in
-#     THEN check an error message is returned to the user
-#     """
-#     response = test_client.post('/login',
-#                                 data=dict(email='patkennedy79@gmail.com', password='FlaskIsNotAwesome'),
-#                                 follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Already logged in!  Redirecting to your User Profile page...' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' in response.data
-#     assert b'Login' not in response.data
-#     assert b'Register' not in response.data
+def test_index(client):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/' page is requested (GET) and user not logged if
+    THEN check the response is valid
+    """
+    logged_in = True
+    response = client.get('/')
+    assert response.status_code == 302
+    assert b'Redirecting...' in response.data
 
 
-# def test_valid_registration(test_client, init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/register' page is posted to (POST)
-#     THEN check the response is valid and the user is logged in
-#     """
-#     response = test_client.post('/register',
-#                                 data=dict(email='patkennedy79@yahoo.com',
-#                                           password='FlaskIsGreat',
-#                                           confirm='FlaskIsGreat'),
-#                                 follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Thanks for registering, patkennedy79@yahoo.com!' in response.data
-#     assert b'Welcome patkennedy79@yahoo.com!' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' in response.data
-#     assert b'Login' not in response.data
-#     assert b'Register' not in response.data
-
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/logout' page is requested (GET)
-#     THEN check the response is valid
-#     """
-#     response = test_client.get('/logout', follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Goodbye!' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' not in response.data
-#     assert b'Login' in response.data
-#     assert b'Register' in response.data
-
-
-# def test_invalid_registration(test_client, init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/register' page is posted to with invalid credentials (POST)
-#     THEN check an error message is returned to the user
-#     """
-#     response = test_client.post('/register',
-#                                 data=dict(email='patkennedy79@hotmail.com',
-#                                           password='FlaskIsGreat',
-#                                           confirm='FlskIsGreat'),   # Does NOT match!
-#                                 follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Thanks for registering, patkennedy79@hotmail.com!' not in response.data
-#     assert b'Welcome patkennedy79@hotmail.com!' not in response.data
-#     assert b'[This field is required.]' not in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' not in response.data
-#     assert b'Login' in response.data
-#     assert b'Register' in response.data
-
-
-# def test_duplicate_registration(test_client, init_database):
-#     """
-#     GIVEN a Flask application configured for testing
-#     WHEN the '/register' page is posted to (POST) using an email address already registered
-#     THEN check an error message is returned to the user
-#     """
-#     # Register the new account
-#     test_client.post('/register',
-#                      data=dict(email='pkennedy@hey.com',
-#                                password='FlaskIsTheBest',
-#                                confirm='FlaskIsTheBest'),
-#                      follow_redirects=True)
-#     # Try registering with the same email address
-#     response = test_client.post('/register',
-#                                 data=dict(email='pkennedy@hey.com',
-#                                           password='FlaskIsStillTheBest',
-#                                           confirm='FlaskIsStillTheBest'),
-#                                 follow_redirects=True)
-#     assert response.status_code == 200
-#     assert b'Already registered!  Redirecting to your User Profile page...' in response.data
-#     assert b'Thanks for registering, pkennedy@hey.com!' not in response.data
-#     assert b'Welcome pkennedy@hey.com!' in response.data
-#     assert b'Flask User Management' in response.data
-#     assert b'Logout' in response.data
-#     assert b'Login' not in response.data
-#     assert b'Register' not in response.data
+def test_duplicate_signup(client, init_database):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the '/register' page is posted to (POST) using a username already registered
+    THEN check an error message is returned to the user
+    """
+    # Register the new account
+    client.post('/signup',
+                data=dict(username='user4',
+                          password='password4',
+                          first_name='User4Fname',
+                          last_name='User4Lname'),
+                follow_redirects=True)
+    # Try registering with the same username
+    response = client.post('/signup',
+                           data=dict(username='user4',
+                                     password='password4',
+                                     first_name='User4Fname',
+                                     last_name='User4Lname'),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert b'Login' not in response.data
