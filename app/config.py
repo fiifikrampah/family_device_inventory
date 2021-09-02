@@ -15,7 +15,7 @@ class Config:
     DATABASE = os.environ.get('POSTGRES_DB')
     PORT = os.environ.get('POSTGRES_PORT')
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
+    DATABASE_URL = f"postgres+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DATABASE}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
