@@ -1,0 +1,37 @@
+{
+    "name": "Family Device Inventory",
+    "description": "A simple containerized database Flask application that allows family members to manage and keep track of devices they own.",
+    "keywords": [
+        "flask",
+        "postgresql",
+        "Docker"
+    ],
+    "repository": "https://github.com/fiifikrampah/family_device_inventory",
+    "success_url": "/",
+    "scripts": {
+        "postdeploy": "make heroku_setup"
+    },
+    "env": {
+        "FLASK_ENV": {
+            "description": "Environment variable which specifies the Flask configuration.",
+            "value": "prod"
+        },
+        "SECRET_KEY": {
+            "description": "Secret key needed for CSFR token.",
+            "value": "VerySecureKey2021"
+        }
+    },
+    "addons": [
+        {
+            "plan": "heroku-postgresql",
+            "options": {
+                "version": "9.5"
+            }
+        }
+    ],
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ]
+}

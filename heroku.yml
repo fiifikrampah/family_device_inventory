@@ -1,0 +1,12 @@
+# Resources to provision on app creation
+setup:
+  addons:
+    - plan: heroku-postgresql
+      as: DATABASE
+# Reference the Dockerfile to build
+build:
+  docker:
+    web: Dockerfile
+# Specify the command to run the application
+run:
+  web: /bin/bash -c 'gunicorn manage:app'
