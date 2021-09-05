@@ -1,14 +1,27 @@
+"""
+This file initializes the flask app.
+"""
 import os
 from flask import Flask
 from flask_migrate import Migrate
 from sqlalchemy_utils import create_database, database_exists
+from flask_bootstrap import Bootstrap
 from app.models import db
 from app.views import views
-from flask_bootstrap import Bootstrap
 from app.config import config
 
 
 def create_app(test_config=None):
+    """
+    This method creates a flask app object with a
+    given configuration.
+
+    Args:
+        test_config (dict): Defaults to None.
+
+    Returns:
+        app (Flask): Flask app object.
+    """
     app = Flask(__name__)
     Bootstrap(app)
     # check environment variables to see which config to load

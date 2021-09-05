@@ -1,8 +1,14 @@
+"""
+This file contains the Users table definition.
+"""
 from .base import db
 import hashlib
 
 
 class Users(db.Model):
+    """
+    Users table
+    """
     __tablename__ = 'users'
     uid = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
@@ -11,7 +17,8 @@ class Users(db.Model):
     first_name = db.Column(db.String(255), unique=False, nullable=False)
     last_name = db.Column(db.String(255), unique=False, nullable=False)
 
-    def __init__(self, uid, username, password, usertype, first_name, last_name):
+    def __init__(self, uid, username, password, usertype,
+                 first_name, last_name):
         self.uid = uid
         self.username = username
         self.password = hashlib.md5(password.encode('utf-8')).hexdigest()

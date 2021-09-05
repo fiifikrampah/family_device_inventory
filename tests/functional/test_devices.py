@@ -1,15 +1,16 @@
 """
 This file contains the functional tests for the `devices` blueprint.
 
-These tests use GETs and POSTs to different URLs to check for the proper behavior
-of the `devices` blueprint.
+These tests use GETs and POSTs to different URLs to check for the
+proper behavior of the `devices` blueprint.
 """
 
 
 def test_inventory(client):
     """
     GIVEN a Flask application configured for testing
-    WHEN the '/inventory/<category>' page is requested (GET) with a sample category
+    WHEN the '/inventory/<category>' page is requested (GET)
+    with a sample category
     THEN check the response is valid
     """
     response = client.get('/inventory/Phone')
@@ -40,7 +41,8 @@ def test_add_device(client):
 def test_select_device(client):
     """
     GIVEN a Flask application configured for testing
-    WHEN the '/select_device' page is requested (GET) with a sample letter range
+    WHEN the '/select_device' page is requested (GET)
+    with a sample letter range
     THEN check the response is valid
     """
     response = client.get('/select_device/AF')

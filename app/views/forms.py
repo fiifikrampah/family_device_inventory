@@ -1,8 +1,15 @@
+"""
+This file contains WTF Forms to be rendered in views.
+"""
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, SelectField, RadioField, HiddenField, StringField, IntegerField, FloatField, TextAreaField, PasswordField
-from wtforms.validators import InputRequired, Length, Regexp, NumberRange
+from wtforms import SubmitField, SelectField, HiddenField, StringField, TextAreaField, PasswordField
+from wtforms.validators import InputRequired
+
 
 class UserLogIn(FlaskForm):
+    """
+    User login form
+    """
     username = StringField('Username')
     password = PasswordField('Password')
     sign_in = SubmitField('Sign In')
@@ -10,6 +17,9 @@ class UserLogIn(FlaskForm):
 
 
 class AddUser(FlaskForm):
+    """
+    User registration form
+    """
     uid = HiddenField()
     username = StringField('Username', [InputRequired()])
     password = PasswordField('Password', [InputRequired()])
@@ -20,6 +30,9 @@ class AddUser(FlaskForm):
 
 
 class AddDevice(FlaskForm):
+    """
+    Form for adding a new device
+    """
     # id used only by update/edit
     id_field = HiddenField()
     device_name = StringField('Name')
@@ -45,6 +58,9 @@ class AddDevice(FlaskForm):
 
 
 class DeleteForm(FlaskForm):
+    """
+    Delete form
+    """
     id_field = HiddenField()
     purpose = HiddenField()
     submit = SubmitField('Delete This Device')

@@ -2,7 +2,6 @@ from app.models import Users, Devices
 from app.models import db
 import testing.postgresql
 import pytest
-import sqlalchemy
 from app import create_app
 from app.views.views import logged_in
 
@@ -16,8 +15,10 @@ def new_user():
 
 @pytest.fixture(scope='module')
 def new_device():
-    device = Devices(1029384756, 'testDeviceName', 'testDevice', '11111111', 'testDeviceModel',
-                     'A1:B2:C3:D4:F6', 'Active', '08/22/2021', 'testUser', 'test', 'Just a test device.')
+    device = Devices(1029384756, 'testDeviceName', 'testDevice',
+                     '11111111', 'testDeviceModel',
+                     'A1:B2:C3:D4:F6', 'Active', '08/22/2021',
+                     'testUser', 'test', 'Just a test device.')
     return device
 
 
@@ -26,10 +27,18 @@ def init_database():
     # Create the database and the database table
     db.create_all()
     # Insert user data
-    user1 = Users(uid='123456789', username='user1', password='password1',
-                  usertype='FamilyMember', first_name='User1Fname', last_name='User1Lname')
-    user2 = Users(uid='987654321', username='user2', password='password2',
-                  usertype='FamilyMember', first_name='User2Fname', last_name='User2Lname')
+    user1 = Users(uid='123456789',
+                  username='user1',
+                  password='password1',
+                  usertype='FamilyMember',
+                  first_name='User1Fname',
+                  last_name='User1Lname')
+    user2 = Users(uid='987654321',
+                  username='user2',
+                  password='password2',
+                  usertype='FamilyMember',
+                  first_name='User2Fname',
+                  last_name='User2Lname')
     db.session.add(user1)
     db.session.add(user2)
     # Commit the changes for the users

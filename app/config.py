@@ -1,6 +1,7 @@
 """
-This file holds configuration options. The Development config is default and spins up
-the application inside a Docker container. Production config allows the app to be run on Heroku. 
+This file holds configuration options.
+The Development config is default and spins up the application inside
+a Docker container. Production config allows the app to be run on Heroku.
 """
 import os
 

@@ -1,8 +1,8 @@
 """
 This file contains the functional tests for the `users` blueprint.
 
-These tests use GETs and POSTs to different URLs to check for the proper behavior
-of the `users` blueprint.
+These tests use GETs and POSTs to different URLs to check for
+the proper behavior of the `users` blueprint.
 """
 
 
@@ -70,7 +70,8 @@ def test_index(client):
 def test_duplicate_signup(client, init_database):
     """
     GIVEN a Flask application configured for testing
-    WHEN the '/register' page is posted to (POST) using a username already registered
+    WHEN the '/register' page is posted to (POST) using a
+    username already registered
     THEN check an error message is returned to the user
     """
     # Register the new account
