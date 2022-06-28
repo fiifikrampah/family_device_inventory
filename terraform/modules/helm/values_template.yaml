@@ -1,0 +1,9 @@
+flask:
+  name: fdi
+  image: fiifikrampah/fdi:latest
+  containerPort: 5050
+  targetPort: 5050
+  appPort: 80
+  postgres_host: "${postgres_host}"
+  postgres_port: "${postgres_port}"
+  postgres_db: "${postgres_db}"
