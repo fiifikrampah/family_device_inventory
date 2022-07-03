@@ -95,7 +95,7 @@ Here are 4 simple steps to get started with running a local instance of the app.
    docker-compose up --build -d
    ```
 
-4. Navigate to `localhost:5000` to view the running app locally
+4. Navigate to `localhost:5050` to view the running app locally
 
 <!-- USAGE EXAMPLES -->
 ## Usage

@@ -19,4 +19,4 @@ ENV FLASK_ENV=prod
 ENV SECRET_KEY=VerySecureKey
 
 # Expose the port needed for the app
-EXPOSE 5000
+EXPOSE 5050
