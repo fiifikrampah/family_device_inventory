@@ -11,6 +11,7 @@ from app.models import db, Users
 
 class WrongSignIn(Exception):
     """Raised when the sign in form is blank but sign-in is pressed"""
+
     pass
 
 
@@ -118,7 +119,7 @@ def hash_password(password):
     Returns:
         hashed_password (str): md5 hashed password.
     """
-    hashed_password = hashlib.md5(password.encode('utf-8')).hexdigest()
+    hashed_password = hashlib.md5(password.encode("utf-8")).hexdigest()
     return hashed_password
 
 
