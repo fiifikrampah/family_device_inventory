@@ -39,7 +39,8 @@ class ProductionConfig(Config):
     Requires the environment variable `FLASK_ENV=prod`
     """
 
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = Config.DATABASE_URL
+
     DEBUG = False
 
 

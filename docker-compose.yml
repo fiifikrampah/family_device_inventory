@@ -5,14 +5,14 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
     volumes:
       - .:/code
     depends_on:
       - db
     env_file: .env
     environment:
-      - FLASK_ENV=dev
+      - FLASK_ENV=prod
     ports:
       - 5000:5000
     entrypoint:

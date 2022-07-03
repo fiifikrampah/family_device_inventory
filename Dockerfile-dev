@@ -5,6 +5,7 @@ LABEL maintainer "Fiifi Krampah"
 COPY . /code
 WORKDIR /code
 RUN pip install -r requirements.txt
+RUN pip install -r requirements-dev.txt
 
 ENV FLASK_ENV=dev
 EXPOSE 5000
