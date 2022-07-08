@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: flask-service
+spec:
+  selector:
+    pod: {{ .Values.flask.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.flask.appPort }}
+      targetPort: {{ .Values.flask.targetPort }}
+  type: LoadBalancer
