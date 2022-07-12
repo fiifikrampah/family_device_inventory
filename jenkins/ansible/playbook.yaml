@@ -1,0 +1,74 @@
+---
+- hosts: all
+  become: true
+  remote_user: ec2-user
+  become_user: root
+  tasks:
+    - name: install wget
+      yum:
+        name: wget
+        state: present
+
+    - name: install git
+      yum:
+        name: git
+        state: present
+
+    - name: install docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start Docker
+      service:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: install openjdk
+      yum:
+        name: java-1.8.0-openjdk
+        state: present
+
+    - name: download jenkins.repo
+      get_url:
+        url: http://pkg.jenkins-ci.org/redhat-stable/jenkins.repo
+        dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: import jenkins key
+      rpm_key:
+        state: present
+        key: https://jenkins-ci.org/redhat/jenkins-ci.org.key
+
+    - name: install jenkins
+      yum:
+        name: jenkins
+        state: present
+
+    - name: start jenkins
+      systemd:
+        name: jenkins
+        state: started
+
+    - name: enable jenkins
+      systemd:
+        name: jenkins
+        enabled: true
+
+    - name: init Jenkins password
+      command: cat /var/lib/jenkins/secrets/initialAdminPassword
+      changed_when: false
+      register: result
+
+    - name: print init Jenkins password
+      debug:
+        var: result.stdout
+
+    - name: Set correct docker.sock permissions
+      file:
+        path: /var/run/docker.sock
+        mode: "0666"
+
+    - name: Add jenkins user to docker group
+      command: usermod -aG docker jenkins
+      changed_when: false
