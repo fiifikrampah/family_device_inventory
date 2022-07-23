@@ -1,33 +1,74 @@
 version: 2
 jobs:
-  backend_format:
+  python_tests:
     docker:
       - image: circleci/python:3.9.6
     steps:
       - checkout
       - run:
-          command: |
-            pip install -r requirements-dev.txt --user
-  backend_test:
-    docker:
-      - image: circleci/python:3.9.6
-    steps:
-      - checkout
-      - run:
-          name: Install postgres
+          name: Install Postgres
           command: |
             sudo apt-get -y update && sudo apt-get install postgresql
       - run:
-          name: install dependencies and run tests
+          name: Install dependencies and run pytest
           command: |
             virtualenv venv
             source venv/bin/activate
-            pip install -r requirements.txt 
+            pip install -r requirements.txt
             pip install -r requirements-dev.txt
             pytest tests
+
+  ci_validation:
+    docker:
+      - image: cimg/base:2021.04
+    steps:
+      - checkout
+      - run:
+          name: Install Packer, Terraform and Helm
+          command: |
+            sudo apt update
+            curl -LO https://releases.hashicorp.com/packer/1.8.1/packer_1.8.1_linux_amd64.zip
+            curl -LO https://releases.hashicorp.com/terraform/1.2.1/terraform_1.2.1_linux_amd64.zip
+            sudo unzip '*.zip' -d /usr/local/bin
+            rm *.zip
+            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+            chmod 700 get_helm.sh
+            ./get_helm.sh
+      - run:
+          name: Run Packer Validate
+          command: |
+            packer validate -syntax-only jenkins/packer
+      - run:
+          name: Run Terraform init
+          command: |
+            terraform -chdir=terraform init
+            terraform -chdir=jenkins/terraform init
+      - run:
+          name: Run Terraform validate
+          command: |
+            terraform -chdir=terraform validate
+            terraform -chdir=jenkins/terraform validate
+      - run:
+          name: Run Terraform fmt
+          command: |
+            terraform -chdir=terraform fmt -check
+            terraform -chdir=jenkins/terraform fmt -check
+      - run:
+          name: Run Terraform plan
+          command: |
+            # The jenkins check can only be performed if the infrastructure has already been deployed before
+            # terraform -chdir=jenkins/terraform plan
+            terraform -chdir=terraform plan -var aws_access_key=${AWS_ACCESS_KEY_ID} -var aws_secret_key=${AWS_SECRET_ACCESS_KEY}
+
+      # The Helm check can only be performed if the infrastructure has already been deployed before
+      # - run:
+      #     name: Run Helm lint
+      #     command: |
+      #       helm lint kubernetes
+
 workflows:
   version: 2
-  build-test:
+  fdi-ci-test:
     jobs:
-      - backend_format
-      - backend_test
+      - python_tests
+      - ci_validation
